@@ -1,0 +1,42 @@
+openapi: 3.0.3
+info:
+  title: palatable
+  version: 0.1.0
+paths:
+  /item:
+    post:
+      summary: Creates a culinary item.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Item"
+      responses:
+        201:
+          description: A culinary item object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+components:
+  schemas:
+    Item:
+      properties:
+        name:
+          type: string
+          description: Name of the item, i.e. meal, drink, etc.
+          example: Smoked Margherita
+        institution:
+          type: string
+          description: Institution where item was sampled, i.e. restaurant, bar, event, etc.
+          example: Theo's Pizzeria
+        date:
+          type: string
+          format: date
+          description: Date in RFC3999 format when item was sampled.
+          example: 2020-02-24
+        observations:
+          type: string
+          description: Any particular observations/notes about the item.
+          example: Goes really well with black pepper. Consider omitting the datterini tomatoes.
