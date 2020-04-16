@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: palatable
-  version: 0.1.0
+  version: 0.1.1
 paths:
   /restaurant:
     get:
@@ -25,15 +25,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/500Error"
     post:
       summary: Create a restaurant entry.
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/Restaurant"
+              schema:
+                properties:
+                  name:
+                    type: string
+                    description: Name of the restaurant, cafe, bar, etc.
+                    example: Theo's Pizzeria
       responses:
         201:
           description: A restaurant, cafe, bar, etc.
@@ -46,28 +50,42 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/400Error"
         422:
           description: Unparseable body content.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/422Error"
         500:
           description: Database error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/500Error"
 components:
   schemas:
     Restaurant:
       properties:
+        id:
+          type: string
+          description: Unique KSUID for the restaurant.
+          example: rest_1adelLkJhopmPvgT68i1QVovC8r
         name:
           type: string
           description: Name of the restaurant, cafe, bar, etc.
           example: Theo's Pizzeria
-    Error:
+        created_at:
+          type: string
+          format: date-time
+          description: RFC3339 timestamp when restaurant entry was created.
+          example: "2020-01-01 20:00:00.000000+00"
+        updated_at:
+          type: string
+          format: date-time
+          description: RFC3339 timestamp when restaurant entry was last updated.
+          example: "2020-01-01 20:00:00.000000+00"
+    400Error:
       properties:
         detail:
           type: string
@@ -77,3 +95,23 @@ components:
           type: integer
           description: HTTP status code of the error
           example: 400
+    422Error:
+      properties:
+        detail:
+          type: string
+          description: Error message returned by application.
+          example: unexpected EOF
+        status:
+          type: integer
+          description: HTTP status code of the error
+          example: 422
+    500Error:
+      properties:
+        detail:
+          type: string
+          description: Error message returned by application.
+          example: 'pq: duplicate key value violates unique constraint "uix_restaurants"'
+        status:
+          type: integer
+          description: HTTP status code of the error
+          example: 500
