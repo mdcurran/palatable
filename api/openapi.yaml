@@ -3,40 +3,77 @@ info:
   title: palatable
   version: 0.1.0
 paths:
-  /item:
+  /restaurant:
+    get:
+      summary: Retrieve a restaurant entry.
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+          required: true
+          description: Name of the restaurant.
+      responses:
+        200:
+          description: Successfully returned restaurant.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
+        500:
+          description: Database error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     post:
-      summary: Creates a culinary item.
+      summary: Create a restaurant entry.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Item"
+              $ref: "#/components/schemas/Restaurant"
       responses:
         201:
-          description: A culinary item object.
+          description: A restaurant, cafe, bar, etc.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Item"
+                $ref: "#/components/schemas/Restaurant"
+        400:
+          description: Bad request body.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: Unparseable body content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Database error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
-    Item:
+    Restaurant:
       properties:
         name:
           type: string
-          description: Name of the item, i.e. meal, drink, etc.
-          example: Smoked Margherita
-        institution:
-          type: string
-          description: Institution where item was sampled, i.e. restaurant, bar, event, etc.
+          description: Name of the restaurant, cafe, bar, etc.
           example: Theo's Pizzeria
-        date:
+    Error:
+      properties:
+        detail:
           type: string
-          format: date
-          description: Date in RFC3999 format when item was sampled.
-          example: 2020-02-24
-        observations:
-          type: string
-          description: Any particular observations/notes about the item.
-          example: Goes really well with black pepper. Consider omitting the datterini tomatoes.
+          description: Error message returned by application.
+          example: no name query parameter provided
+        status:
+          type: integer
+          description: HTTP status code of the error
+          example: 400
