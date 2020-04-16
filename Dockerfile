@@ -20,7 +20,8 @@ RUN go mod download
 COPY . .
 
 # Vet for issues
-RUN go vet ./...
+RUN export CGO_ENABLED=0 GOOS=linux GOARCH=amd64 && \
+    go vet ./...
 
 # Build the Go binary
 RUN export CGO_ENABLED=0 GOOS=linux GOARCH=amd64 && \
