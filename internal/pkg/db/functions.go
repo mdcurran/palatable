@@ -16,13 +16,38 @@ func GetRestaurant(name string) (*Restaurant, error) {
 
 // PostRestaurant creates an entry and returns the corresponding Restaurant
 // object.
-func PostRestaurant(r Restaurant) (*Restaurant, error) {
+func PostRestaurant(r *Restaurant) error {
+    db, err := get()
+    if err != nil {
+        return err
+    }
+
+    err = db.Create(&r).Error
+
+    return err
+}
+
+// GetItems returns all items for a given restaurant.
+func GetItems(restaurantID string) ([]*Item, error) {
     db, err := get()
     if err != nil {
         return nil, err
     }
 
-    err = db.Create(&r).Error
+    var items []*Item
+    err = db.Where("restaurant_id = ?", restaurantID).Find(&items).Error
 
-    return &r, err
+    return items, err
+}
+
+// PostItem creates an entry and returns the corresponding Item object.
+func PostItem(i *Item) error {
+    db, err := get()
+    if err != nil {
+        return err
+    }
+
+    err = db.Create(&i).Error
+
+    return err
 }

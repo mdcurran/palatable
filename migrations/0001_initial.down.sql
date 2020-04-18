@@ -1,4 +1,4 @@
 BEGIN;
 DROP TABLE IF EXISTS restaurants CASCADE;
-DROP TABLE IF EXISTS restaurant_addresses;
+DROP TABLE IF EXISTS items;
 COMMIT;

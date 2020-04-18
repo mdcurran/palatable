@@ -1,43 +1,123 @@
 openapi: 3.0.3
 info:
   title: palatable
-  version: 0.1.1
+  version: 0.2.0
+servers:
+  - url: http://palatable.mdcurran.com/api
 paths:
-  /restaurant:
+  /liveness:
     get:
-      summary: Retrieve a restaurant entry.
-      parameters:
-        - in: path
-          name: name
-          schema:
-            type: string
-          required: true
-          description: Name of the restaurant.
+      summary: Kubernetes liveness probe.
       responses:
         200:
-          description: Successfully returned restaurant.
+          description: Application is healthy!
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Restaurant"
+                properties:
+                  message:
+                    type: string
+                    description: Kubernetes liveness probe message.
+                    example: Application healthy!
+  /item:
+    post:
+      summary: Create an item entry.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                title:
+                 type: string
+                 description: Name of the item.
+                 example: Smoked Margherita
+                restaurant:
+                  type: string
+                  description: Name of the restaurant, cafe, bar, etc.
+                  example: Theo's Pizzeria
+                description:
+                  type: string
+                  description: A general description of what the item is, any notable elements, etc.
+                  example: Similar to a standard margherita, but uses mozzarella that has been smoked. There is also additional black pepper.
+                review:
+                  type: string
+                  description: A freeform review of the item.
+                  example: Overall I prefer it to the normal Margherita. Smokiness is subtle but cannot be missed.
+                date:
+                  type: string
+                  format: date-time
+                  description: Date when item was consumed.
+                  example: "2020-01-01T00:00:00.000000Z"
+              required:
+                - title
+                - restaurant
+                - description
+                - review
+                - date
+      responses:
+        201:
+          description: A culinary item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+        400:
+          description: Bad request body.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/400Error"
+        422:
+          description: Unparseable body content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/422Error"
         500:
           description: Database error.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/500Error"
+  /restaurant:
     post:
       summary: Create a restaurant entry.
       requestBody:
         required: true
         content:
           application/json:
-              schema:
-                properties:
-                  name:
-                    type: string
-                    description: Name of the restaurant, cafe, bar, etc.
-                    example: Theo's Pizzeria
+            schema:
+              properties:
+                name:
+                  type: string
+                  description: Name of the restaurant, cafe, bar, etc.
+                  example: Theo's Pizzeria
+                line_one:
+                  type: string
+                  description: Address line one of restaurant.
+                  example: 2 Grove Lane
+                line_two:
+                  type: string
+                  description: Address line two of restaurant.
+                  example: Camberwell
+                city:
+                  type: string
+                  description: City where restaurant is based.
+                  example: London
+                postcode:
+                  type: string
+                  description: Country-specific postal code of restaurant.
+                  example: SE5 8SY
+                country:
+                  type: string
+                  description: Country where restaurant is based.
+                  example: United Kingdom
+              required:
+                - name
+                - line_one
+                - postcode
+                - country
       responses:
         201:
           description: A restaurant, cafe, bar, etc.
@@ -63,9 +143,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/500Error"
+  /restaurant/{name}:
+    get:
+      summary: Retrieve a restaurant entry.
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+          required: true
+          description: Name of the restaurant.
+      responses:
+        200:
+          description: Successfully returned restaurant.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
+        500:
+          description: Database error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/500Error"
+  /restaurant/{name}/items:
+    get:
+      summary: Retrieves a list of items associated to a restaurant.
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+          required: true
+          description: Name of the restaurant.
+      responses:
+        200:
+          description: Restaurant items.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Item"
+        500:
+          description: Database error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/500Error"
 components:
   schemas:
     Restaurant:
+      type: object
       properties:
         id:
           type: string
@@ -75,16 +204,74 @@ components:
           type: string
           description: Name of the restaurant, cafe, bar, etc.
           example: Theo's Pizzeria
+        line_one:
+          type: string
+          description: Address line one of restaurant.
+          example: 2 Grove Lane
+        line_two:
+          type: string
+          description: Address line two of restaurant.
+          example: Camberwell
+        city:
+          type: string
+          description: City where restaurant is based.
+          example: London
+        postcode:
+          type: string
+          description: Country-specific postal code of restaurant.
+          example: SE5 8SY
+        country:
+          type: string
+          description: Country where restaurant is based.
+          example: United Kingdom
         created_at:
           type: string
           format: date-time
           description: RFC3339 timestamp when restaurant entry was created.
-          example: "2020-01-01 20:00:00.000000+00"
+          example: "2020-01-01T20:00:00.000000Z"
         updated_at:
           type: string
           format: date-time
           description: RFC3339 timestamp when restaurant entry was last updated.
-          example: "2020-01-01 20:00:00.000000+00"
+          example: "2020-01-01T20:00:00.000000Z"
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique KSUID for the item.
+          example: item_0ujsszwN8NRY24YaXiTIE2VWDTS
+        restaurant_id:
+          type: string
+          description: Unique KSUID for the restaurant.
+          example: rest_1adelLkJhopmPvgT68i1QVovC8r
+        title:
+          type: string
+          description: Name of the item.
+          example: Smoked Margherita
+        description:
+          type: string
+          description: A general description of what the item is, any notable elements, etc.
+          example: Similar to a standard margherita, but uses mozzarella that has been smoked. There is also additional black pepper.
+        review:
+          type: string
+          description: A freeform review of the item.
+          example: Overall I prefer it to the normal Margherita. Smokiness is subtle but cannot be missed.
+        date:
+          type: string
+          format: date-time
+          description: Date when item was consumed.
+          example: "2020-01-01T00:00:00.000000Z"
+        created_at:
+          type: string
+          format: date-time
+          description: RFC3339 timestamp when restaurant entry was created.
+          example: "2020-01-01T20:00:00.000000Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: RFC3339 timestamp when restaurant entry was last updated.
+          example: "2020-01-01T20:00:00.000000Z"
     400Error:
       properties:
         detail:
@@ -110,7 +297,7 @@ components:
         detail:
           type: string
           description: Error message returned by application.
-          example: 'pq: duplicate key value violates unique constraint "uix_restaurants"'
+          example: 'pq: column "naxme" does not exist'
         status:
           type: integer
           description: HTTP status code of the error

@@ -27,8 +27,10 @@ func New() *Server {
 
 func (s *Server) buildRouteTable() {
     s.Router.GET("/api/liveness", s.handleLiveness)
-    s.Router.GET("/api/restaurant", s.getRestaurant)
-    s.Router.POST("/api/restaurant", s.postRestaurant)
+	s.Router.POST("/api/restaurant", s.postRestaurant)
+	s.Router.POST("/api/item", s.postItem)
+	s.Router.GET("/api/restaurant/:name", s.getRestaurant)
+	s.Router.GET("/api/restaurant/:name/items", s.listItems)
 }
 
 // encodeJSON takes content of any type (v) and encodes to the writer (w) in

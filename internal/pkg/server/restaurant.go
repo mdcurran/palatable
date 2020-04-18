@@ -12,8 +12,8 @@ import (
 	"github.com/mdcurran/palatable/internal/pkg/db"
 )
 
-func (s *Server) getRestaurant(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-    name := r.URL.Query().Get("name")
+func (s *Server) getRestaurant(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+    name := p.ByName("name")
     if name == "" {
         Error(w, errors.New("no name query parameter provided"), http.StatusBadRequest)
         return
@@ -46,11 +46,11 @@ func (s *Server) postRestaurant(w http.ResponseWriter, r *http.Request, _ httpro
         return
     }
 
-    result, err := db.PostRestaurant(restaurant)
+    err = db.PostRestaurant(&restaurant)
     if err != nil {
         Error(w, err, http.StatusInternalServerError)
         return
     }
 
-    s.encodeJSON(w, result)
+    s.encodeJSON(w, &restaurant)
 }
