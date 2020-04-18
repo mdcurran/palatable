@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
   title: palatable
-  version: 0.2.0
+  version: 0.2.1
 servers:
-  - url: http://palatable.mdcurran.com/api
+  - url: http://api.palatable.mdcurran.com
 paths:
   /liveness:
     get:
@@ -32,10 +32,10 @@ paths:
                  type: string
                  description: Name of the item.
                  example: Smoked Margherita
-                restaurant:
+                restaurant_id:
                   type: string
-                  description: Name of the restaurant, cafe, bar, etc.
-                  example: Theo's Pizzeria
+                  description: Unique KSUID for the restaurant.
+                  example: rest_1adelLkJhopmPvgT68i1QVovC8r
                 description:
                   type: string
                   description: A general description of what the item is, any notable elements, etc.
@@ -51,7 +51,7 @@ paths:
                   example: "2020-01-01T00:00:00.000000Z"
               required:
                 - title
-                - restaurant
+                - restaurant_id
                 - description
                 - review
                 - date

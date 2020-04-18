@@ -8,7 +8,7 @@ import (
 )
 
 func TestServer_HandleLiveness(t *testing.T) {
-    req := httptest.NewRequest(http.MethodGet, "/api/liveness", nil)
+    req := httptest.NewRequest(http.MethodGet, "/liveness", nil)
     res := httptest.NewRecorder()
 
     s := New()
