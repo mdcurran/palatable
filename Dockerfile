@@ -29,7 +29,7 @@ RUN export CGO_ENABLED=0 GOOS=linux GOARCH=amd64 && \
     -installsuffix cgo \
     -ldflags="-w -s" \
     -o /go/bin/server \
-    cmd/main.go
+    palatable/main.go
 
 ## Final image
 FROM scratch

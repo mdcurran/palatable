@@ -2,27 +2,36 @@ package server
 
 import (
     "encoding/json"
-    "log"
     "net/http"
-    "os"
 
     "github.com/julienschmidt/httprouter"
+    "go.uber.org/zap"
 )
 
 // Server exposes RESTful API endpoints.
 type Server struct {
     Router *httprouter.Router
-    logger *log.Logger
+    Logger *zap.SugaredLogger
 }
 
 // New instantiates an HTTP server and builds a route table.
 func New() *Server {
     s := Server{
         Router: httprouter.New(),
-        logger: log.New(os.Stderr, "API: ", 0),
+        Logger: initialiseLogger(),
     }
     s.buildRouteTable()
     return &s
+}
+
+func initialiseLogger() *zap.SugaredLogger {
+    logger, err := zap.NewProduction()
+    if err != nil {
+        panic(err)
+    }
+    // Use the zap.SugaredLogger as recommended in the zap documentation:
+    // https://godoc.org/go.uber.org/zap#hdr-Choosing_a_Logger
+    return logger.Sugar()
 }
 
 func (s *Server) buildRouteTable() {
@@ -40,6 +49,7 @@ func (s *Server) encodeJSON(w http.ResponseWriter, v interface{}) {
     err := json.NewEncoder(w).Encode(v)
     if err != nil {
         Error(w, err, http.StatusInternalServerError)
+        return
     }
 }
 
