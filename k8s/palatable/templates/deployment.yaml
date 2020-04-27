@@ -2,36 +2,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Chart.name }}
+  name: palatable
   labels:
-    app: {{ .Chart.name }}
+    app: palatable
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: {{ .Chart.name }}
-    template:
-      metadata:
-        labels:
-          app: {{ .Chart.name }}
-      spec:
-        containers:
-          - name: {{ .Chart.name }}
-            image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
-            env:
-              - name: POSTGRES_URL
-                value: {{ .Values.postgresql.url }}
-            ports:
-              - name: http
-                containerPort: 8080
-                protocol: TCP
-            readinessProbe:
-              httpGet:
-                path: /api/liveness
-                port: 8080
-            livenessProbe:
-              httpGet:
-                path: /api/liveness
-                port: 8080
-              periodSeconds: 10
+      app: palatable
+  template:
+    metadata:
+      labels:
+        app: palatable
+    spec:
+      containers:
+        - name: palatable
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POSTGRES_URL
+              value: {{ .Values.postgresql.url }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /liveness
+              port: 8080
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 8080
+            periodSeconds: 10
